@@ -1,8 +1,10 @@
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { useLoaderData } from 'react-router';
+import { useLoaderData, useNavigate } from 'react-router';
 
 import useAuth from '../../hooks/useAuth';
+import Swal from 'sweetalert2';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const SendParcel = () => {
     const {
@@ -12,8 +14,8 @@ const SendParcel = () => {
         // formState: { errors } 
     } = useForm();
     const { user } = useAuth();
-    // const axiosSecure = useAxiosSecure();
-    // const navigate = useNavigate();
+    const axiosSecure = useAxiosSecure();
+    const navigate = useNavigate();
 
     const serviceCenters = useLoaderData();
     const regionsDuplicate = serviceCenters.map(c => c.region);
@@ -57,36 +59,43 @@ const SendParcel = () => {
         console.log('cost', cost);
         data.cost = cost;
 
-        // Swal.fire({
-        //     title: "Agree with the Cost?",
-        //     text: `You will be charged ${cost} taka!`,
-        //     icon: "warning",
-        //     showCancelButton: true,
-        //     confirmButtonColor: "#3085d6",
-        //     cancelButtonColor: "#d33",
-        //     confirmButtonText: "Confirm and Continue Payment!"
-        // }).then((result) => {
-        //     if (result.isConfirmed) {
+        Swal.fire({
+            title: "Agree with the Cost?",
+            text: `You will be charged ${cost} taka!`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Confirm and Continue Payment!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Swal.fire({
+                //                 position: "top-end",
+                //                 icon: "success",
+                //                 title: "Parcel has created. Please Pay",
+                //                 showConfirmButton: false,
+                //                 timer: 2500
+                //             });
 
-        //         // save the parcel info to the database
-        //         axiosSecure.post('/parcels', data)
-        //             .then(res => {
-        //                 console.log('after saving parcel', res.data);
-        //                 if (res.data.insertedId) {
-        //                     navigate('/dashboard/my-parcels')
-        //                     Swal.fire({
-        //                         position: "top-end",
-        //                         icon: "success",
-        //                         title: "Parcel has created. Please Pay",
-        //                         showConfirmButton: false,
-        //                         timer: 2500
-        //                     });
-        //                 }
-        //             })
+                // save the parcel info to the database
+                axiosSecure.post('/parcels', data)
+                    .then(res => {
+                        console.log('after saving parcel', res.data);
+                        if (res.data.insertedId) {
+                            navigate('/dashboard/my-parcels')
+                            Swal.fire({
+                                position: "top-end",
+                                icon: "success",
+                                title: "Parcel has created. Please Pay",
+                                showConfirmButton: false,
+                                timer: 2500
+                            });
+                        }
+                    })
 
 
-        //     }
-        // });
+            }
+        });
 
     }
 
